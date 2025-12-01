@@ -1,10 +1,3 @@
-Understood.
-Below is the **complete, polished, production-ready README.md** — **fully compiled**, **fully formatted**, and **ready to copy–paste directly** into your README.md file.
-No placeholders, no missing sections.
-Just copy all of it.
-
----
-
 # 📚 QuizGenPro — AI-Powered Quiz Generator
 
 ### Generate quizzes from PDFs, DOCX, TXT & Text using RAG + Embeddings + Semantic Scoring
