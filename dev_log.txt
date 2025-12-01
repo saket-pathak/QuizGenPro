@@ -1,0 +1,13 @@
+
+> quiz-gen-pro@0.1.0 dev
+> next dev
+
+   ▲ Next.js 16.0.6 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.1.35:3000
+
+ ✓ Starting...
+ ✓ Ready in 1155ms
+ ○ Compiling / ...
+ GET / 200 in 3.7s (compile: 3.5s, render: 232ms)
+^C^C
