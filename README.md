@@ -11,18 +11,13 @@ Built using **Next.js (App Router)**, **TypeScript**, **TailwindCSS**, **pdf.js*
 
 ## 🚀 Live Demo
 
-*(Add your link after deployment)*
-👉 [https://your-deployment-url.vercel.app](https://your-deployment-url.vercel.app)
+
 
 ---
 
 ## 🖼️ Screenshot
 
-(Add a screenshot in `public/screenshot.png`)
 
-```markdown
-![QuizGenPro](./public/screenshot.png)
-```
 
 ---
 
