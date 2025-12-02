@@ -1020,6 +1020,123 @@ export default function Home() {
   const drawerRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
+  // --- Demo / preview helpers ---
+  const [demoMode, setDemoMode] = useState(false);
+  const [showHowGenerated, setShowHowGenerated] = useState(false);
+
+  // -----------------------
+  // Hand-picked DEMO QUESTIONS (Bio / Chem / Geo)
+  // -----------------------
+  const HARDCODED_DEMO_QUESTIONS: Question[] = [
+    {
+      question_id: "demo-bio-1",
+      type: "single",
+      prompt: "Which organelle produces ATP in eukaryotic cells?",
+      choices: [
+        { choice_id: "b1", text: "Ribosome" },
+        { choice_id: "b2", text: "Mitochondrion" },
+        { choice_id: "b3", text: "Golgi apparatus" }
+      ],
+      match_pairs: [],
+      correct_choice_ids: ["b2"],
+      correct_written_answers: [],
+      points: 2,
+      difficulty: "easy",
+      explanation: "Mitochondria produce ATP in eukaryotic cells.",
+      topics: ["Biology"]
+    },
+    {
+      question_id: "demo-chem-1",
+      type: "single",
+      prompt: "What is the pH of a neutral solution at 25°C?",
+      choices: [
+        { choice_id: "c1", text: "1" },
+        { choice_id: "c2", text: "7" },
+        { choice_id: "c3", text: "14" }
+      ],
+      match_pairs: [],
+      correct_choice_ids: ["c2"],
+      correct_written_answers: [],
+      points: 1,
+      difficulty: "easy",
+      explanation: "Neutral pH at 25°C is 7.",
+      topics: ["Chemistry"]
+    },
+    {
+      question_id: "demo-chem-2",
+      type: "written",
+      prompt: "Define catalyst in one sentence.",
+      choices: [],
+      match_pairs: [],
+      correct_choice_ids: [],
+      correct_written_answers: [
+        "A catalyst increases the reaction rate without being consumed."
+      ],
+      points: 3,
+      difficulty: "medium",
+      explanation: "Catalysts lower activation energy and are not consumed.",
+      topics: ["Chemistry"]
+    },
+    {
+      question_id: "demo-geo-1",
+      type: "single",
+      prompt: "Which is the longest river in the world?",
+      choices: [
+        { choice_id: "g1", text: "Amazon River" },
+        { choice_id: "g2", text: "Nile River" },
+        { choice_id: "g3", text: "Yangtze River" }
+      ],
+      match_pairs: [],
+      correct_choice_ids: ["g2"],
+      correct_written_answers: [],
+      points: 2,
+      difficulty: "medium",
+      explanation: "Nile is traditionally considered the longest.",
+      topics: ["Geography"]
+    },
+    {
+      question_id: "demo-geo-2",
+      type: "match",
+      prompt: "Match the capitals with their countries.",
+      choices: [],
+      match_pairs: [
+        { left: "Japan", right: "Tokyo" },
+        { left: "Brazil", right: "Brasília" },
+        { left: "Australia", right: "Canberra" }
+      ],
+      correct_choice_ids: [],
+      correct_written_answers: [],
+      points: 3,
+      difficulty: "medium",
+      explanation: "Basic capital-city matching question.",
+      topics: ["Geography"]
+    }
+  ];
+
+  // Build a quiz object from the hand-picked questions
+  const buildDemoQuiz = (): Quiz => {
+    const total_points = HARDCODED_DEMO_QUESTIONS.reduce((s, q) => s + (q.points || 0), 0);
+    return {
+      quiz_id: `demo_quiz_${Date.now()}`,
+      document_id: "demo_doc",
+      title: "Demo Quiz — Bio / Chem / Geo",
+      description: "Hand-picked demo questions.",
+      question_count: HARDCODED_DEMO_QUESTIONS.length,
+      total_points,
+      questions: HARDCODED_DEMO_QUESTIONS,
+      metadata: { generated_by: "handcrafted_demo", generated_at: new Date().toISOString() }
+    };
+  };
+
+  // Start the demo quiz using the hard-coded questions
+  const runDemoQuizHandpicked = () => {
+    setDemoMode(true);
+    setDocumentMeta({ document_id: "demo_doc", filename: "Handpicked Demo" });
+    setQuiz(buildDemoQuiz());
+    setView("quiz");
+  };
+
+
   // load persisted history from localStorage (client-only)
   useEffect(() => {
     try {
@@ -1293,7 +1410,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer */} 
       {mobileNavOpen && (
         <div className="fixed inset-0 z-40">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileNavOpen(false)} />
@@ -1354,16 +1471,79 @@ export default function Home() {
       </div>
 
       <div className="flex-1 overflow-auto">
-        {view === 'upload' && (
-          <DocumentUploadPage onUploadSuccess={(meta) => { setDocumentMeta(meta); setView('confirm'); }} />
+       {view === 'upload' && (
+  <div className="max-w-full">
+    {/* Document upload component (keeps original onUploadSuccess behaviour) */}
+    <DocumentUploadPage onUploadSuccess={(meta) => { setDocumentMeta(meta); setView('confirm'); }} />
+
+    {/* Demo & explanation panel below the uploader */}
+    <div className="max-w-3xl mx-auto mt-6 p-4 space-y-4">
+      <div className="flex items-center justify-between bg-white p-4 rounded-lg border">
+        <div>
+          <h3 className="text-lg font-semibold">Try a Demo Quiz (no file required)</h3>
+          <p className="text-sm text-slate-600">If you don’t have a PDF/DOCX handy, run the demo to see how the quiz player and generation flow works.</p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+  onClick={() => { runDemoQuizHandpicked(); }}
+  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+>
+  Show Demo Quiz
+</button>
+
+
+          <button
+            onClick={() => { setDemoMode(false); setDocumentMeta(null); setView('upload'); }}
+            className="px-3 py-2 border rounded-md"
+            title="Reset demo"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white p-4 rounded-lg border">
+        <button
+          onClick={() => setShowHowGenerated(s => !s)}
+          className="w-full text-left flex items-center justify-between"
+        >
+          <div>
+            <h4 className="font-medium">How the quiz is generated</h4>
+            <p className="text-sm text-slate-500">Click to view an overview of the generation steps.</p>
+          </div>
+          <div className="text-slate-400">{showHowGenerated ? '▲' : '▼'}</div>
+        </button>
+
+        {showHowGenerated && (
+          <div className="mt-3 text-sm text-slate-700 space-y-2">
+            <ol className="list-decimal pl-5">
+              <li><strong>Text extraction</strong> — extract text from PDFs/DOCX/TXT (pdf.js / mammoth).</li>
+              <li><strong>Chunking</strong> — split content into contextual chunks for retrieval.</li>
+              <li><strong>Embedding & retrieval</strong> — create embeddings and find relevant context (RAG).</li>
+              <li><strong>Question generation</strong> — LLM creates questions and distractors from the retrieved context.</li>
+              <li><strong>Semantic evaluation</strong> — written answers are scored by semantic similarity to expected answers.</li>
+              <li><strong>Save & analytics</strong> — attempts and insights are stored for progress tracking (optional).</li>
+            </ol>
+            <p className="text-xs text-slate-500">Note: The demo uses the client-side `generateMockQuiz` for illustration. To produce production-quality quizzes connect the backend `/api/generate-question` and embedding/indexing services.</p>
+          </div>
         )}
+      </div>
+    </div>
+  </div>
+)}
+
 
         {view === 'confirm' && documentMeta && (
           <div className="max-w-full sm:max-w-2xl mx-auto mt-8 sm:mt-20 p-4 sm:p-8 bg-white rounded-xl shadow-sm">
             <div className="flex items-center gap-4 mb-6">
               <FileText className="w-12 h-12 text-blue-600" />
               <div>
-                <h2 className="text-2xl font-bold text-slate-900">{documentMeta.filename}</h2>
+                <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+  {documentMeta.filename}
+  {demoMode && <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-800">Demo</span>}
+</h2>
+
                 <p className="text-slate-500">{documentMeta.page_count} Pages • {(documentMeta.size_bytes / 1024).toFixed(1)} KB</p>
                 {/* Indexing status (if server-side extract returned embedding info) */}
                 {documentMeta?.extractResponse && (
